@@ -8,9 +8,9 @@ using System.Drawing.Drawing2D;
 
 namespace Cyberpaint_2077 {
 	[Serializable]
-	class MyText : AbstractFigure {
-		string text;
-		Font font;
+	public class MyText : AbstractFigure {
+		//string text;
+		//Font font;
 		public MyText(Point startPosition, Point endPosition, int brushSize, Color colorLine, Color colorBackground, bool fillFlag, Font font, string text) : base(startPosition, endPosition, brushSize, colorLine, colorBackground, fillFlag) {
 			this.text = text;
 			this.font = font;
@@ -41,6 +41,8 @@ namespace Cyberpaint_2077 {
 
 		public override void FigureAlign(List<Point> nodes) {
 			pointList = nodes;
+			figureBox = CreateFigureBox();
+			resizeMarkers = CreateResizeMarkers();
 		}
 	}
 }

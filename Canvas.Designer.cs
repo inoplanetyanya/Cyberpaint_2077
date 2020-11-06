@@ -46,7 +46,9 @@
 			this.DoubleBuffered = true;
 			this.Name = "Canvas";
 			this.Size = new System.Drawing.Size(480, 480);
+			this.Click += new System.EventHandler(this.Canvas_Click);
 			this.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Paint);
+			this.DoubleClick += new System.EventHandler(this.Canvas_DoubleClick);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Canvas_KeyDown);
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_MouseDown);
 			this.MouseLeave += new System.EventHandler(this.Canvas_MouseLeave);
@@ -59,6 +61,6 @@
 
 		#endregion
 
-		private System.Windows.Forms.TextBox textBox;
+		public System.Windows.Forms.TextBox textBox;
 	}
 }

@@ -48,6 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractFigure.cs" />
+    <Compile Include="AddNewFigure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewFigure.Designer.cs">
+      <DependentUpon>AddNewFigure.cs</DependentUpon>
+    </Compile>
     <Compile Include="Canvas.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -61,6 +67,30 @@
       <DependentUpon>ChildForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DrawParameters.cs" />
+    <Compile Include="EditDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditDialog.Designer.cs">
+      <DependentUpon>EditDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditFigurePositionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditFigurePositionDialog.Designer.cs">
+      <DependentUpon>EditFigurePositionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditFigureSizeDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditFigureSizeDialog.Designer.cs">
+      <DependentUpon>EditFigureSizeDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditPointsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditPointsDialog.Designer.cs">
+      <DependentUpon>EditPointsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,11 +119,26 @@
     <Compile Include="SerializebleData.cs" />
     <Compile Include="SomeMethodsForCanvas.cs" />
     <Compile Include="SomeMethodsForMainForm.cs" />
+    <EmbeddedResource Include="AddNewFigure.resx">
+      <DependentUpon>AddNewFigure.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Canvas.resx">
       <DependentUpon>Canvas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ChildForm.resx">
       <DependentUpon>ChildForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditDialog.resx">
+      <DependentUpon>EditDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditFigurePositionDialog.resx">
+      <DependentUpon>EditFigurePositionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditFigureSizeDialog.resx">
+      <DependentUpon>EditFigureSizeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditPointsDialog.resx">
+      <DependentUpon>EditPointsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

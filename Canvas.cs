@@ -150,7 +150,7 @@ namespace Cyberpaint_2077 {
 		Point[] sortedPoints;
 		List<Point> points;
 		bool mousePressed = false, canMoveFigures = false;
-		AbstractFigure figure;
+		AbstractFigure figure, figureDash;
 
 		int brushSize;
 		Color colorLine, colorBackGround;
@@ -159,12 +159,26 @@ namespace Cyberpaint_2077 {
 		Font font;
 
 		AbstractFigure figureOnCursor = null;
-		bool mousePressedOnFigure = false;
 
+		public AbstractFigure GetFigureOnCursor() {
+			return figureOnCursor;
+		}
+
+		bool mousePressedOnFigure = false;
 		bool copyingToMetafile = false;
+		bool mousePressedOnResizeMarker = false;
+		int activeResizeMarker = -1;
+
+		Tuple<Cursor, int> cursorAndMarkerIndex;
 
 		List<AbstractFigure> grid = null;
 		List<Point> gridNodes = null;
+
+		string textForCheckTextbox = string.Empty;
+
+		public void SetTextForCheckTextBox(string text) {
+			textForCheckTextbox = text;
+		}
 
 		private void Canvas_MouseDown(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
@@ -182,6 +196,15 @@ namespace Cyberpaint_2077 {
 				endPosition = e.Location;
 				mousePressed = true;
 
+				if (Cursor != Cursors.Default && Cursor != Cursors.SizeAll) {
+					mousePressedOnResizeMarker = true;
+					activeResizeMarker = cursorAndMarkerIndex.Item2;
+				}
+				else {
+					mousePressedOnResizeMarker = false;
+					activeResizeMarker = -1;
+				}
+
 				points = new List<Point>();
 				points.Add(startPosition);
 
@@ -192,7 +215,7 @@ namespace Cyberpaint_2077 {
 		private void Canvas_MouseMove(object sender, MouseEventArgs e) {
 			SomeMethodsForMainForm.RefreshStatusBarCursorPosition(e.X.ToString() + " ; " + e.Y.ToString());
 
-			if (mousePressed && selectionFlag && !canMoveFigures && !mousePressedOnFigure) {
+			if (mousePressed && selectionFlag && !canMoveFigures && !mousePressedOnFigure && !mousePressedOnResizeMarker) {
 				endPosition = e.Location;
 				sortedPoints = SomeMethodsForCanvas.SortPoints(startPosition, endPosition);
 				figure = new MyRectangle(sortedPoints[0], sortedPoints[1], 1, Color.Black, Color.White, false);
@@ -206,17 +229,38 @@ namespace Cyberpaint_2077 {
 				}
 			}
 
-			if (mousePressed && canMoveFigures) {
+			cursorAndMarkerIndex = SomeMethodsForCanvas.RefreshCursor(this, e.Location);
+
+			if (GetPickedFigures().Count == 1) {
+				if (cursorAndMarkerIndex.Item2 != -1) {
+					Cursor = cursorAndMarkerIndex.Item1;
+				}
+				else {
+					Cursor = cursorAndMarkerIndex.Item1;
+				}
+			}
+
+			if (mousePressed && canMoveFigures && !mousePressedOnResizeMarker) {
 				mousePressedOnFigure = true;
 			}
 
-			if (figureOnCursor != null) Cursor = Cursors.SizeAll;
-			else {
-				Cursor = Cursors.Default;
+			if (figureOnCursor != null) Cursor = cursorAndMarkerIndex.Item1;
+			else if (cursorAndMarkerIndex.Item2 == -1) {
+				Cursor = cursorAndMarkerIndex.Item1;
 				canMoveFigures = false;
 			}
 
 			figureOnCursor = null;
+
+			if (mousePressedOnResizeMarker) {
+				Point p1 = startPosition;
+				Point p2 = endPosition;
+				p2 = e.Location;
+				Rectangle rectangle = SomeMethodsForCanvas.GetResizedFigureBox(p2.X - p1.X, p2.Y - p1.Y, activeResizeMarker, GetPickedFigures().First().GetFigureBox());
+				figureDash = new MyRectangle(rectangle.Location, new Point(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), 1, Color.Black, Color.White, false);
+				p1 = e.Location;
+				Refresh();
+			}
 
 			if (mousePressedOnFigure) {
 				endPosition = e.Location;
@@ -280,7 +324,7 @@ namespace Cyberpaint_2077 {
 					textBox.Clear();
 					textBox.BackColor = colorBackGround;
 					textBox.Font = font;
-					textBox.ClientSize = figure.GetFigureBox().Size;
+					textBox.Size = figure.GetFigureBox().Size;
 					textBox.Show();
 					textBox.Focus();
 				}
@@ -293,19 +337,66 @@ namespace Cyberpaint_2077 {
 				}
 			}
 
-			if (selectionFlag && !canMoveFigures) {
-				if (endPosition == startPosition) {
-					endPosition.Offset(1, 1);
-					sortedPoints = SomeMethodsForCanvas.SortPoints(startPosition, endPosition);
+			if (selectionFlag && !canMoveFigures && !mousePressedOnResizeMarker) {
+				if (startPosition != endPosition) {
 					figure = new MyRectangle(sortedPoints[0], sortedPoints[1], 1, Color.Black, Color.White, false);
+					SomeMethodsForCanvas.PickFigures(this, figure);
 				}
-				SomeMethodsForCanvas.PickFigures(this, figure);
+			}
+
+			if (mousePressedOnResizeMarker && DrawParameters.GetGridBinging() && GetPickedFigures().Count() == 1) {
+				endPosition = e.Location;
+				GetPickedFigures().First().ResizeFigure(endPosition.X - startPosition.X, endPosition.Y - startPosition.Y, activeResizeMarker);
+				GetPickedFigures().First().FigureAlign(SomeMethodsForCanvas.FindNearNodes(GetPickedFigures().First(), gridNodes));
+			}
+			else if (mousePressedOnResizeMarker && GetPickedFigures().Count() == 1) {
+				endPosition = e.Location;
+				if (SomeMethodsForCanvas.BordersCheckForResizingFigure(GetPickedFigures().First(), this, endPosition.X - startPosition.X, endPosition.Y - startPosition.Y, activeResizeMarker)) {
+					GetPickedFigures().First().ResizeFigure(endPosition.X - startPosition.X, endPosition.Y - startPosition.Y, activeResizeMarker);
+				}
 			}
 
 			mousePressed = false;
 			mousePressedOnFigure = false;
+			mousePressedOnResizeMarker = false;
 			figure = null;
 			Refresh();
+		}
+
+		private void Canvas_Click(object sender, EventArgs e) {
+			if (selectionFlag && !canMoveFigures && !mousePressedOnResizeMarker) {
+				RestoreFigures();
+
+				List<AbstractFigure> list = GetFigures().Where(a => SomeMethodsForCanvas.CursorInRectangle(a.GetFigureBox(), startPosition)).ToList();
+
+				if (list.Count > 0) {
+					AbstractFigure f = list.Last();
+					RemoveFigure(f);
+					AddPickedFigure(f);
+				}
+				
+				DrawParameters.SetPickedSingleFigure(false, null);
+				SomeMethodsForMainForm.GetMainForm().StatusBarRefresh();
+			}
+		}
+
+		private void Canvas_DoubleClick(object sender, EventArgs e) {
+			if (selectionFlag && canMoveFigures && !mousePressedOnResizeMarker) {
+				if (GetPickedFigures().Count == 1) {
+					DrawParameters.SetPickedSingleFigure(true, GetPickedFigures().First());
+					SomeMethodsForMainForm.GetMainForm().StatusBarRefresh();
+					if (GetPickedFigures().First() is MyText) {
+						SomeMethodsForMainForm.GetMainForm().ShowEditTextButton();
+					}
+					else {
+						SomeMethodsForMainForm.GetMainForm().HideEditTextButton();
+					}
+				}
+				else {
+					DrawParameters.SetPickedSingleFigure(false, null);
+					SomeMethodsForMainForm.GetMainForm().StatusBarRefresh();
+				}
+			}
 		}
 
 		private void textBox_Leave(object sender, EventArgs e) {
@@ -315,21 +406,47 @@ namespace Cyberpaint_2077 {
 
 		private void Canvas_KeyDown(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Delete) {
+				DrawParameters.SetPickedSingleFigure(false, null);
 				DeletePickedFigures();
 				Refresh();
 			}
 		}
 
 		private void textBox_KeyDown(object sender, KeyEventArgs e) {
-			if (e.KeyCode == Keys.Enter && textBox.Text != "") {
-				text = textBox.Text;
-				figure = new MyText(sortedPoints[0], sortedPoints[1], brushSize, colorLine, colorBackGround, fillFlag, font, text);
-				if (DrawParameters.GetGridBinging()) figure.FigureAlign(SomeMethodsForCanvas.FindNearNodes(figure, gridNodes));
-				if (figureInCanvas) AddFigure(figure);
-				textBox.Hide();
-				figure = null;
+			if (textForCheckTextbox == "") {
+				if (e.KeyCode == Keys.Enter && textBox.Text != "") {
+					text = textBox.Text;
+					figure = new MyText(sortedPoints[0], sortedPoints[1], brushSize, colorLine, colorBackGround, fillFlag, font, text);
+					if (DrawParameters.GetGridBinging()) figure.FigureAlign(SomeMethodsForCanvas.FindNearNodes(figure, gridNodes));
+					if (figureInCanvas) AddFigure(figure);
+					textBox.Hide();
+					figure = null;
+					textForCheckTextbox = string.Empty;
+				}
+				Refresh();
 			}
-			Refresh();
+			else if (GetPickedFigures().Count == 1) {
+				if (e.KeyCode == Keys.Enter) {
+					text = textBox.Text;
+
+					AbstractFigure targetFigure = DrawParameters.GetSingleFigure();
+					Point p1 = targetFigure.GetFigureBox().Location;
+					Point p2 = targetFigure.GetFigureBox().Location;
+					p2.Offset(targetFigure.GetFigureBox().Width, targetFigure.GetFigureBox().Height);
+					int bs = targetFigure.GetBrushSize();
+					Font f = targetFigure.GetFont();
+					Color cl = targetFigure.GetColorLine();
+					Color cb = targetFigure.GetColorBackground();
+					bool ff = targetFigure.GetFillFlag();
+
+					GetPickedFigures()[0] = new MyText(p1, p2, bs, cl, cb, ff, f, text);
+					if (DrawParameters.GetGridBinging()) figure.FigureAlign(SomeMethodsForCanvas.FindNearNodes(figure, gridNodes));
+					textBox.Hide();
+					figure = null;
+					textForCheckTextbox = string.Empty;
+				}
+				Refresh();
+			}
 		}
 
 		private void Canvas_Paint(object sender, PaintEventArgs e) {
@@ -343,12 +460,18 @@ namespace Cyberpaint_2077 {
 
 			foreach (AbstractFigure f in GetFigures()) {
 				f.Draw(g);
-				//g.DrawRectangle(new Pen(Color.Red, 1), f.GetFigureBox());
 			}
 
 			foreach (AbstractFigure f in GetPickedFigures()) {
 				if (copyingToMetafile) f.Draw(g);
-				else f.DrawDash(g);
+				else {
+					f.DrawDash(g);
+					if (figureDash != null) {
+						figureDash.DrawDash(g);
+						figureDash = null;
+					}
+					if (DrawParameters.GetPickedSingleFigureState()) f.DrawResizeMarkers(g);
+				}
 			}
 
 			if (figure != null) {

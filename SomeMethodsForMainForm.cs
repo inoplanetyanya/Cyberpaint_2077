@@ -160,7 +160,8 @@ namespace Cyberpaint_2077 {
 			menuItem.Checked = true;
 		}
 
-		public static Size GetNewFormSize(RadioButton RB320x240, RadioButton RB640x480, RadioButton RB800x600) {
+		public static Size GetNewFormSize(RadioButton RB320x240, RadioButton RB640x480, RadioButton RB800x600, TextBox width, TextBox height, CheckBox checkBox) {
+			if (checkBox.Checked) return new Size(Convert.ToInt32(width.Text), Convert.ToInt32(height.Text));
 			if (RB320x240.Checked) return new Size(320, 240);
 			if (RB640x480.Checked) return new Size(640, 480);
 			if (RB800x600.Checked) return new Size(800, 600);
@@ -171,6 +172,10 @@ namespace Cyberpaint_2077 {
 
 		public static void SetMainForm(MainForm form) {
 			mainForm = form;
+		}
+
+		public static MainForm GetMainForm() {
+			return mainForm;
 		}
 
 		public static void RefreshStatusBarCursorPosition(string position) {
@@ -184,7 +189,9 @@ namespace Cyberpaint_2077 {
 		public static void SelectionButtonClick(Button button){
 			if (button.BackColor != Color.Gray) button.BackColor = Color.Gray;
 			else button.BackColor = Color.FromArgb(240, 240, 240);
+			DrawParameters.SetPickedSingleFigure(false, null);
 			DrawParameters.SetObjectSelectionFlag(!DrawParameters.GetObjectSelectionFlag());
+			mainForm.StatusBarRefresh();
 		}
 
 		public static void ChangeFont() {

@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
 			this.labelPenSizeText = new System.Windows.Forms.Label();
 			this.groupBoxFigures = new System.Windows.Forms.GroupBox();
+			this.EditTextButton = new System.Windows.Forms.Button();
 			this.buttonSelection = new System.Windows.Forms.Button();
 			this.buttonFont = new System.Windows.Forms.Button();
 			this.RBText = new System.Windows.Forms.RadioButton();
@@ -98,6 +99,7 @@
 			this.EditPasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.EditSelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.AlignToGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.SubEditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.groupBoxFigures.SuspendLayout();
 			this.panel1.SuspendLayout();
 			this.groupBoxGrid.SuspendLayout();
@@ -121,6 +123,7 @@
 			this.groupBoxFigures.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBoxFigures.AutoSize = true;
+			this.groupBoxFigures.Controls.Add(this.EditTextButton);
 			this.groupBoxFigures.Controls.Add(this.buttonSelection);
 			this.groupBoxFigures.Controls.Add(this.buttonFont);
 			this.groupBoxFigures.Controls.Add(this.RBText);
@@ -137,6 +140,16 @@
 			this.groupBoxFigures.TabStop = false;
 			this.groupBoxFigures.Text = "Фигуры";
 			// 
+			// EditTextButton
+			// 
+			this.EditTextButton.Location = new System.Drawing.Point(143, 92);
+			this.EditTextButton.Name = "EditTextButton";
+			this.EditTextButton.Size = new System.Drawing.Size(142, 23);
+			this.EditTextButton.TabIndex = 7;
+			this.EditTextButton.Text = "Редактировать текст";
+			this.EditTextButton.UseVisualStyleBackColor = true;
+			this.EditTextButton.Click += new System.EventHandler(this.EditTextButton_Click);
+			// 
 			// buttonSelection
 			// 
 			this.buttonSelection.BackColor = System.Drawing.SystemColors.Control;
@@ -152,7 +165,7 @@
 			// 
 			this.buttonFont.Location = new System.Drawing.Point(204, 17);
 			this.buttonFont.Name = "buttonFont";
-			this.buttonFont.Size = new System.Drawing.Size(75, 23);
+			this.buttonFont.Size = new System.Drawing.Size(81, 23);
 			this.buttonFont.TabIndex = 5;
 			this.buttonFont.Text = "Шрифт";
 			this.buttonFont.UseVisualStyleBackColor = true;
@@ -865,7 +878,8 @@
             this.EditCutToolStripMenuItem,
             this.EditPasteToolStripMenuItem,
             this.EditSelectAllToolStripMenuItem,
-            this.AlignToGridToolStripMenuItem});
+            this.AlignToGridToolStripMenuItem,
+            this.SubEditToolStripMenuItem});
 			this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
 			this.EditToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
 			this.EditToolStripMenuItem.Text = "Правка";
@@ -912,6 +926,13 @@
 			this.AlignToGridToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
 			this.AlignToGridToolStripMenuItem.Text = "Выровнять по сетке";
 			this.AlignToGridToolStripMenuItem.Click += new System.EventHandler(this.AlignToGridToolStripMenuItem_Click);
+			// 
+			// SubEditToolStripMenuItem
+			// 
+			this.SubEditToolStripMenuItem.Name = "SubEditToolStripMenuItem";
+			this.SubEditToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+			this.SubEditToolStripMenuItem.Text = "Редактировать";
+			this.SubEditToolStripMenuItem.Click += new System.EventHandler(this.SubEditToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -1021,6 +1042,8 @@
 		private System.Windows.Forms.ToolStripMenuItem AlignToGridToolStripMenuItem;
 		private System.Windows.Forms.Label SlotPitchLabel;
 		private System.Windows.Forms.TextBox SlotPitch;
+		private System.Windows.Forms.Button EditTextButton;
+		private System.Windows.Forms.ToolStripMenuItem SubEditToolStripMenuItem;
 	}
 }
 

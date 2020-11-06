@@ -10,7 +10,7 @@ namespace Cyberpaint_2077 {
 	public static class SomeMethodsForCanvas {
 
 		public static Point[] SortPoints(Point p1, Point p2) {
-			int tmp; 
+			int tmp;
 			if (p1.X > p2.X) { tmp = p2.X; p2.X = p1.X; p1.X = tmp; }
 			if (p1.Y > p2.Y) { tmp = p2.Y; p2.Y = p1.Y; p1.Y = tmp; }
 			return new Point[] { p1, p2 };
@@ -18,14 +18,17 @@ namespace Cyberpaint_2077 {
 
 		public static bool BordersCheck(AbstractFigure figure, Canvas canvas) {
 			Rectangle rectangle = Rectangle.Intersect(figure.GetFigureBox(), new Rectangle(new Point(0, 0), new Size(canvas.Width - 1, canvas.Height - 1)));
-			if (rectangle == figure.GetFigureBox()) return true;
-			return false;
+			return rectangle == figure.GetFigureBox();
 		}
 
 		public static bool BordersCheckForMovingFigures(AbstractFigure figure, Canvas canvas, int dx, int dy) {
 			Rectangle rectangle = Rectangle.Intersect(figure.GetShiftedFigureBox(dx, dy), new Rectangle(new Point(0, 0), new Size(canvas.Width - 1, canvas.Height - 1)));
-			if (rectangle == figure.GetShiftedFigureBox(dx, dy)) return true;
-			return false;
+			return rectangle == figure.GetShiftedFigureBox(dx, dy);
+		}
+
+		public static bool BordersCheckForResizingFigure(AbstractFigure figure, Canvas canvas, int dx, int dy, int markerIndex) {
+			Rectangle rectangle = Rectangle.Intersect(figure.GetResizedFigureBox(dx, dy, markerIndex), new Rectangle(new Point(0, 0), new Size(canvas.Width - 1, canvas.Height - 1)));
+			return rectangle == figure.GetResizedFigureBox(dx, dy, markerIndex);
 		}
 
 		public static bool IntersectCheck(AbstractFigure figure, AbstractFigure selectionZone) {
@@ -57,13 +60,44 @@ namespace Cyberpaint_2077 {
 		}
 
 		public static bool CursorInFigure(AbstractFigure figure, Point cursorPosition) {
-			if (
-				cursorPosition.X >= figure.GetFigureBox().Location.X &&
-				cursorPosition.X <= figure.GetFigureBox().Location.X + figure.GetFigureBox().Width &&
-				cursorPosition.Y >= figure.GetFigureBox().Location.Y &&
-				cursorPosition.Y <= figure.GetFigureBox().Location.Y + figure.GetFigureBox().Height
-				) return true;
-			return false;
+			return
+			cursorPosition.X >= figure.GetFigureBox().Location.X &&
+			cursorPosition.X <= figure.GetFigureBox().Location.X + figure.GetFigureBox().Width &&
+			cursorPosition.Y >= figure.GetFigureBox().Location.Y &&
+			cursorPosition.Y <= figure.GetFigureBox().Location.Y + figure.GetFigureBox().Height;
+		}
+
+		public static bool CursorInRectangle(Rectangle rectangle, Point cursorPosition) {
+			return
+			cursorPosition.X >= rectangle.X &&
+			cursorPosition.X <= rectangle.X + rectangle.Width &&
+			cursorPosition.Y >= rectangle.Y &&
+			cursorPosition.Y <= rectangle.Y + rectangle.Height;
+		}
+
+		public static Tuple<Cursor, int> RefreshCursor(Canvas canvas, Point cursorPosition) {
+			int i = 0;
+			bool markerFound = false;
+
+			foreach (AbstractFigure figure in canvas.GetPickedFigures()) {
+				foreach (Rectangle rectangle in figure.GetResizeMarkers()) {
+					if (CursorInRectangle(rectangle, cursorPosition)) {
+						markerFound = true;
+						break;
+					}
+					i++;
+				}
+			}
+
+			if (markerFound) {
+				if (i == 0 || i == 7) return new Tuple<Cursor, int>(Cursors.SizeNWSE, i);
+				else if (i == 1 || i == 6) return new Tuple<Cursor, int>(Cursors.SizeWE, i);
+				else if (i == 2 || i == 5) return new Tuple<Cursor, int>(Cursors.SizeNESW, i);
+				else if (i == 3 || i == 4) return new Tuple<Cursor, int>(Cursors.SizeNS, i);
+			}
+
+			if (canvas.GetFigureOnCursor() == null) return new Tuple<Cursor, int>(Cursors.Default, -1);
+			return new Tuple<Cursor, int>(Cursors.SizeAll, -1);
 		}
 
 		public static void CopyAreaToMetafile(Canvas canvas) {
@@ -160,6 +194,64 @@ namespace Cyberpaint_2077 {
 				figure.FigureAlign(FindNearNodes(figure, canvas.GetGridNodes()));
 			}
 			canvas.Refresh();
+		}
+
+		public static Rectangle GetResizedFigureBox(int dx, int dy, int markerIndex, Rectangle figureBox) {
+			Rectangle rectangle = figureBox;
+			switch (markerIndex) {
+				case 0:
+					if (rectangle.Width - dx > 0 && rectangle.Height - dy > 0) {
+						rectangle.Offset(dx, dy);
+						rectangle.Width -= dx;
+						rectangle.Height -= dy;
+					}
+					break;
+				case 1:
+					if (rectangle.Width - dx > 0) {
+						rectangle.Offset(dx, 0);
+						rectangle.Width -= dx;
+					}
+					break;
+				case 2:
+					if (rectangle.Width - dx > 0 && rectangle.Height + dy > 0) {
+						rectangle.Offset(dx, 0);
+						rectangle.Width -= dx;
+						rectangle.Height += dy;
+					}
+					break;
+				case 3:
+					if (rectangle.Height - dy > 0) {
+						rectangle.Offset(0, dy);
+						rectangle.Height -= dy;
+					}
+					break;
+				case 4:
+					if (rectangle.Height + dy > 0) {
+						rectangle.Height += dy;
+					}
+					break;
+				case 5:
+					if (rectangle.Width + dx > 0 && rectangle.Height - dy > 0) {
+						rectangle.Offset(0, dy);
+						rectangle.Width += dx;
+						rectangle.Height -= dy;
+					}
+					break;
+				case 6:
+					if (rectangle.Width + dx > 0) {
+						rectangle.Width += dx;
+					}
+					break;
+				case 7:
+					if (rectangle.Width + dx > 0 && rectangle.Height + dy > 0) {
+						rectangle.Width += dx;
+						rectangle.Height += dy;
+					}
+					break;
+				default:
+					break;
+			}
+			return rectangle;
 		}
 	}
 }

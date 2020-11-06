@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Cyberpaint_2077 {
 	[Serializable]
-	class MyLine : AbstractFigure {
+	public class MyLine : AbstractFigure {
 		public MyLine(Point startPosition, Point endPosition, int brushSize, Color colorLine, Color colorBackground, bool fillFlag) : base(startPosition, endPosition, brushSize, colorLine, colorBackground, fillFlag) {
 
 		}
@@ -37,6 +37,8 @@ namespace Cyberpaint_2077 {
 			}
 
 			pointList = new List<Point>(new Point[] { p1, p2 });
+			figureBox = CreateFigureBox();
+			resizeMarkers = CreateResizeMarkers();
 		}
 	}
 }

@@ -17,6 +17,7 @@ namespace Cyberpaint_2077 {
 			StatusBarRefresh();
 			CheckEditMenu();
 			CheckSaveButtonsStatus();
+			HideEditTextButton();
 		}
 
 		ChildForm activeChild;
@@ -133,6 +134,15 @@ namespace Cyberpaint_2077 {
 				activeChild.PickAllFigures();
 			}
 		}
+
+		private void SubEditToolStripMenuItem_Click(object sender, EventArgs e) {
+			if (activeChild != null) {
+				EditDialog editForm = new EditDialog(activeChild.GetCanvas(), ref activeChild);
+				editForm.ShowDialog();
+				//activeChild.Refresh();
+			}
+		}
+
 		//	ToolStrip Menu END
 
 
@@ -140,11 +150,14 @@ namespace Cyberpaint_2077 {
 
 		//	File Menu START
 		private void buttonCreate_Click(object sender, EventArgs e) {
-			SomeMethodsForMainForm.AddEmptyChildForm(this, SomeMethodsForMainForm.GetNewFormSize(RB320x240, RB640x480, RB800x600));
+			SomeMethodsForMainForm.AddEmptyChildForm(this, SomeMethodsForMainForm.GetNewFormSize(RB320x240, RB640x480, RB800x600, textBoxWidth, textBoxHeight, checkBoxUserSize));
 			RB320x240.Checked = false;
 			RB640x480.Checked = false;
 			RB800x600.Checked = false;
 			buttonCreate.Enabled = false;
+			textBoxWidth.Clear();
+			textBoxHeight.Clear();
+			checkBoxUserSize.Checked = false;
 		}
 
 		private void buttonOpen_Click(object sender, EventArgs e) {
@@ -269,6 +282,7 @@ namespace Cyberpaint_2077 {
 			if (activeChild != null) {
 				activeChild.RestoreFigures();
 				activeChild.GetCanvas().Refresh();
+				StatusBarRefresh();
 			}
 		}
 		//	Figures Menu END
@@ -343,6 +357,7 @@ namespace Cyberpaint_2077 {
 
 		public void StatusBarRefresh() {
 			SBPenSize.Text = Convert.ToInt32(comboBoxPenSize.SelectedItem).ToString();
+			comboBoxPenSize.SelectedItem = DrawParameters.GetBrushSize();
 			SBPenColor.BackColor = DrawParameters.GetColorLine();
 			labelPenColor.BackColor = DrawParameters.GetColorLine();
 			SBBGColor.BackColor = DrawParameters.GetColorBackground();
@@ -351,6 +366,8 @@ namespace Cyberpaint_2077 {
 			SBFont.Text = DrawParameters.GetFont().Name;
 
 			comboBoxPenSize.SelectedIndex = DrawParameters.GetPenIndex();
+
+			if (activeChild != null) activeChild.Refresh();
 		}
 
 		void CheckEditMenu() {
@@ -371,6 +388,8 @@ namespace Cyberpaint_2077 {
 
 				if (activeChild.GetFigures().Count() > 0) EditSelectAllToolStripMenuItem.Enabled = true;
 				else EditSelectAllToolStripMenuItem.Enabled = false;
+
+				SubEditToolStripMenuItem.Enabled = true;
 			}
 			else {
 				EditCopyToolStripMenuItem.Enabled = false;
@@ -378,6 +397,7 @@ namespace Cyberpaint_2077 {
 				EditCutToolStripMenuItem.Enabled = false;
 				EditPasteToolStripMenuItem.Enabled = false;
 				EditSelectAllToolStripMenuItem.Enabled = false;
+				SubEditToolStripMenuItem.Enabled = false;
 			}
 		}
 
@@ -413,6 +433,33 @@ namespace Cyberpaint_2077 {
 			foreach (ChildForm childForm in MdiChildren) {
 				SomeMethodsForMainForm.CreateGrid(gridPitch, childForm.GetCanvas());
 				childForm.GetCanvas().Refresh();
+			}
+		}
+
+		public void ShowEditTextButton() {
+			EditTextButton.Visible = true;
+			EditTextButton.Enabled = true;
+		}
+
+		public void HideEditTextButton() {
+			EditTextButton.Visible = false;
+			EditTextButton.Enabled = false;
+		}
+
+		private void EditTextButton_Click(object sender, EventArgs e) {
+			if (activeChild != null) {
+				if (activeChild.GetPickedFigures().Count == 1 && activeChild.GetPickedFigures().First() is MyText) {
+					TextBox textBox = activeChild.GetCanvas().textBox;
+					AbstractFigure target = activeChild.GetPickedFigures().First();
+					activeChild.GetCanvas().SetTextForCheckTextBox(target.GetText());
+					textBox.Location = target.GetFigureBox().Location;
+					textBox.Text = target.GetText();
+					textBox.BackColor = target.GetColorBackground();
+					textBox.Font = target.GetFont();
+					textBox.Size = target.GetFigureBox().Size;
+					textBox.Show();
+					textBox.Focus();
+				}
 			}
 		}
 	}

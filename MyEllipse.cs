@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Cyberpaint_2077 {
 	[Serializable]
-	class MyEllipse : AbstractFigure {
+	public class MyEllipse : AbstractFigure {
 		public MyEllipse(Point startPosition, Point endPosition, int brushSize, Color colorLine, Color colorBackground, bool fillFlag) : base(startPosition, endPosition, brushSize, colorLine, colorBackground, fillFlag) {
 
 		}
@@ -34,6 +34,8 @@ namespace Cyberpaint_2077 {
 
 		public override void FigureAlign(List<Point> nodes) {
 			pointList = nodes;
+			figureBox = CreateFigureBox();
+			resizeMarkers = CreateResizeMarkers();
 		}
 	}
 }

@@ -19,6 +19,23 @@ namespace Cyberpaint_2077 {
 		static bool gridBinding = false;
 		static int gridPitch = 10;
 
+		static bool pickedSingleFigure = false;
+		static AbstractFigure singleFigure;
+
+		public static AbstractFigure GetSingleFigure() {
+			return singleFigure;
+		}
+
+		public static void SetPickedSingleFigure(bool state, AbstractFigure figure) {
+			pickedSingleFigure = state;
+			singleFigure = figure;
+			SomeMethodsForMainForm.GetMainForm().StatusBarRefresh();
+		}
+
+		public static bool GetPickedSingleFigureState() {
+			return pickedSingleFigure;
+		}
+
 		public static void SetGridBinding(bool binding) {
 			gridBinding = binding;
 		}
@@ -44,11 +61,12 @@ namespace Cyberpaint_2077 {
 		}
 
 		public static int GetBrushSize() {
-			return brushSize;
+			return pickedSingleFigure ? singleFigure.GetBrushSize() : brushSize;
 		}
 
 		public static void SetBrushSize(int size) {
-			brushSize = size;
+			if (pickedSingleFigure) singleFigure.SetBrushSize(size);
+			else brushSize = size;
 		}
 
 		public static int GetPenIndex() {
@@ -60,11 +78,12 @@ namespace Cyberpaint_2077 {
 		}
 
 		public static bool GetFillFlag() {
-			return fillFlag;
+			return pickedSingleFigure ? singleFigure.GetFillFlag() : fillFlag;
 		}
 
 		public static void SetFillFlag(bool state) {
-			fillFlag = state;
+			if (pickedSingleFigure) singleFigure.SetFillFlag(state);
+			else fillFlag = state;
 		}
 
 		public static bool GetObjectSelectionFlag() {
@@ -76,27 +95,30 @@ namespace Cyberpaint_2077 {
 		}
 
 		public static Color GetColorLine() {
-			return colorLine;
+			return pickedSingleFigure ? singleFigure.GetColorLine() : colorLine;
 		}
 
 		public static void SetColorLine(Color color) {
-			colorLine = color;
+			if (pickedSingleFigure) singleFigure.SetColorLine(color);
+			else colorLine = color;
 		}
 
 		public static Color GetColorBackground() {
-			return colorBackGround;
+			return pickedSingleFigure ? singleFigure.GetColorBackground() : colorBackGround;
 		}
 
 		public static void SetColorBackground(Color color) {
-			colorBackGround = color;
+			if (pickedSingleFigure) singleFigure.SetColorBackground(color);
+			else colorBackGround = color;
 		}
 
 		public static Font GetFont() {
-			return font;
+			return pickedSingleFigure ? singleFigure.GetFont() : font;
 		}
 
 		public static void SetFont(Font newFont) {
-			font = newFont;
+			if (pickedSingleFigure) singleFigure.SetFont(newFont);
+			else font = newFont;
 		}
 
 		public static void SetFigureType(string type) {

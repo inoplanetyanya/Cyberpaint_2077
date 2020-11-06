@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Cyberpaint_2077 {
 	[Serializable]
-	class MyCurve : AbstractFigure {
+	public class MyCurve : AbstractFigure {
 		public MyCurve(List<Point> pointList, int brushSize, Color colorLine, Color colorBackground, bool fillFlag) : base(pointList, brushSize, colorLine, colorBackground, fillFlag) {
 
 		}
@@ -28,12 +28,18 @@ namespace Cyberpaint_2077 {
 
 			Point figureCenter = new Point(GetFigureBox().X + GetFigureBox().Width / 2, GetFigureBox().Y + GetFigureBox().Height / 2);
 			MoveFigure(-figureCenter.X, -figureCenter.Y);
+			//figureBox = CreateFigureBox();
+
 
 			for (int i = 0; i < pointList.Count; i++) {
 				pointList[i] = new Point((int)Math.Round(pointList[i].X * scaleCoeffX), (int)Math.Round(pointList[i].Y * scaleCoeffY));
 			}
+			figureBox = CreateFigureBox();
 
 			MoveFigure(nodes.First().X - GetFigureBox().X, nodes.First().Y - GetFigureBox().Y);
+
+			figureBox = CreateFigureBox();
+			resizeMarkers = CreateResizeMarkers();
 		}
 	}
 }
