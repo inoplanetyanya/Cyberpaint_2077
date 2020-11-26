@@ -223,7 +223,7 @@ namespace Cyberpaint_2077 {
 			}
 
 			foreach (AbstractFigure f in GetPickedFigures()) {
-				if (SomeMethodsForCanvas.CursorInFigure(f, e.Location)) {
+				if (SomeMethodsForCanvas.CursorInFigure(f, e.Location) && !mousePressed) {
 					canMoveFigures = true;
 					figureOnCursor = f;
 				}
